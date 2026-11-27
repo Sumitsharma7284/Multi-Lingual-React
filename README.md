@@ -1,5 +1,11 @@
 # e-RajPatra: Real-Time Multi-Lingual Government Order Publishing Platform
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Online%20on%20Render-brightgreen?style=for-the-badge&logo=render)](https://e-rajpatra-platform.onrender.com/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/Kunal225-tech/react-proj)
+
+> 🌐 **Live Application URL:** [https://e-rajpatra-platform.onrender.com/](https://e-rajpatra-platform.onrender.com/)  
+> 🔐 **Admin Access:** [https://e-rajpatra-platform.onrender.com/admin/login](https://e-rajpatra-platform.onrender.com/admin/login) — **Email:** `admin@rajpatra.gov.in` | **Password:** `Admin@12345`
+
 > **Academic Project Showcase**  
 > *Demonstrating Full-Stack MERN Architecture, WebSocket Real-Time Broadcasting, Multi-Lingual Data Modeling, and Document Cloud Archival.*  
 > ⚠️ **Disclaimer:** This software is an academic demonstration and is **not an official government portal**.
