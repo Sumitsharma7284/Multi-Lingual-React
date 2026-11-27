@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+import { getBackendBaseUrl } from '../utils/url';
 
 const SocketContext = createContext();
 
@@ -11,9 +12,7 @@ export const SocketProvider = ({ children }) => {
   const [activeToast, setActiveToast] = useState(null);
 
   useEffect(() => {
-    const socketUrl = import.meta.env.PROD
-      ? window.location.origin
-      : (import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
+    const socketUrl = getBackendBaseUrl();
     console.log('[Socket.IO] Connecting to:', socketUrl);
 
     const socketInstance = io(socketUrl, {

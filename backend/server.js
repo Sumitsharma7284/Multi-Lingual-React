@@ -80,16 +80,50 @@ const ensureAdminBootstrapped = async () => {
       const password = process.env.ADMIN_INITIAL_PASSWORD || 'Admin@12345';
       const name = process.env.ADMIN_INITIAL_NAME || 'System Administrator';
 
-      await Admin.create({
+      const admin = await Admin.create({
         name,
         email,
         password,
         role: 'superadmin',
       });
       console.log(`[AutoBootstrap] Initial System Administrator automatically created: ${email}`);
+      return admin;
     }
+    return await Admin.findOne({ role: 'superadmin' });
   } catch (err) {
     console.warn('[AutoBootstrap Warning] Could not verify admin bootstrapping:', err.message);
+    return null;
+  }
+};
+
+// Ensure sample orders exist if database is fresh/empty on new deployment
+const ensureOrdersBootstrapped = async () => {
+  try {
+    const GovernmentOrder = require('./models/GovernmentOrder');
+    const orderCount = await GovernmentOrder.countDocuments();
+    if (orderCount === 0) {
+      console.log('[AutoBootstrap] Fresh database detected. Auto-populating initial government orders...');
+      const admin = await Admin.findOne({ role: 'superadmin' });
+      if (!admin) return;
+
+      const sampleOrders = require('./utils/sampleOrders');
+      const { ensureSamplePDF } = require('./utils/generatePdf');
+
+      for (const item of sampleOrders) {
+        const pdfMeta = ensureSamplePDF(item.orderNumber, item.title.en, item.department);
+        await GovernmentOrder.create({
+          ...item,
+          pdfUrl: pdfMeta.url,
+          pdfPublicId: pdfMeta.filename,
+          pdfOriginalName: pdfMeta.filename,
+          pdfSize: pdfMeta.size,
+          createdBy: admin._id,
+        });
+      }
+      console.log(`[AutoBootstrap] Successfully populated ${sampleOrders.length} initial government orders into database.`);
+    }
+  } catch (err) {
+    console.warn('[AutoBootstrap Warning] Could not verify orders bootstrapping:', err.message);
   }
 };
 
@@ -112,8 +146,9 @@ const ensureAllOrderPDFsExist = async () => {
 };
 
 // Single-Service Production Setup: Serve React SPA from frontend/dist
-if (process.env.NODE_ENV === 'production') {
-  const distPath = path.join(__dirname, '../frontend/dist');
+const distPath = path.join(__dirname, '../frontend/dist');
+const fs = require('fs');
+if (process.env.NODE_ENV === 'production' || fs.existsSync(distPath)) {
   app.use(express.static(distPath));
 
   app.get('*', (req, res, next) => {
@@ -135,6 +170,7 @@ if (require.main === module) {
     console.log(`[Server] e-RajPatra API Gateway running on port ${PORT}`);
     console.log(`[Server] Environment: ${process.env.NODE_ENV || 'development'}`);
     await ensureAdminBootstrapped();
+    await ensureOrdersBootstrapped();
     await ensureAllOrderPDFsExist();
   });
 }

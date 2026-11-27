@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { getPublicOrderById, summarizeOrder } from '../services/api';
+import { getPdfFullUrl } from '../utils/url';
 import {
   FileText,
   Download,
@@ -60,14 +61,7 @@ const OrderDetailPage = () => {
     setActiveLangTab(language);
   }, [language]);
 
-  const getPdfFullUrl = (url) => {
-    if (!url) return '#';
-    if (url.startsWith('http')) return url;
-    const base = import.meta.env.PROD
-      ? window.location.origin
-      : (import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
-    return `${base}${url}`;
-  };
+
 
   const handlePrint = () => {
     window.print();

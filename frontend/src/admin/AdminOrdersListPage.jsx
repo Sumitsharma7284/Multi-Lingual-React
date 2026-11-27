@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { getAdminOrders, toggleAdminOrderStatus, deleteAdminOrder } from '../services/api';
+import { getPdfFullUrl } from '../utils/url';
 import {
   Search,
   PlusCircle,
@@ -84,14 +85,7 @@ const AdminOrdersListPage = () => {
     }
   };
 
-  const getPdfFullUrl = (url) => {
-    if (!url) return '#';
-    if (url.startsWith('http')) return url;
-    const base = import.meta.env.PROD
-      ? window.location.origin
-      : (import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
-    return `${base}${url}`;
-  };
+
 
   return (
     <div className="space-y-5">

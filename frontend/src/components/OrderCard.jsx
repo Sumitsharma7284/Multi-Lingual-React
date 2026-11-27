@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { summarizeOrder } from '../services/api';
+import { getPdfFullUrl } from '../utils/url';
 import {
   FileText,
   Download,
@@ -31,15 +32,6 @@ const OrderCard = ({ order }) => {
   const [aiSummaries, setAiSummaries] = useState({}); // { [lang]: string[] }
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
-
-  const getPdfFullUrl = (url) => {
-    if (!url) return '#';
-    if (url.startsWith('http')) return url;
-    const base = import.meta.env.PROD
-      ? window.location.origin
-      : (import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
-    return `${base}${url}`;
-  };
 
   const fetchSummaryForLang = async (lang, force = false) => {
     if (!force && aiSummaries[lang]) return;
