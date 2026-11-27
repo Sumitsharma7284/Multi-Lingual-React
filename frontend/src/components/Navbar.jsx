@@ -14,7 +14,19 @@ import {
   ExternalLink,
   UserCheck,
   Building,
+  ChevronDown,
 } from 'lucide-react';
+
+const popularDepartments = [
+  'Higher Education',
+  'Health & Family Welfare',
+  'Agriculture & Farmer Welfare',
+  'Transport & Highways',
+  'Information Technology',
+  'Finance & Taxation',
+  'Social Justice & Empowerment',
+  'Personnel & Administrative Reforms',
+];
 
 const Navbar = () => {
   const { language, switchLanguage, t, getLocalized, fontSizeLevel, adjustFontSize } = useLanguage();
@@ -24,13 +36,18 @@ const Navbar = () => {
   const location = useLocation();
 
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isDeptOpen, setIsDeptOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const notifRef = useRef(null);
+  const deptRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notifRef.current && !notifRef.current.contains(event.target)) {
         setIsNotifOpen(false);
+      }
+      if (deptRef.current && !deptRef.current.contains(event.target)) {
+        setIsDeptOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -173,19 +190,77 @@ const Navbar = () => {
             <Link
               to="/orders"
               className={`px-3.5 py-1.5 rounded-md transition ${
-                isActive('/orders')
+                isActive('/orders') && !location.search.includes('department=')
                   ? 'text-[#B84A00] bg-[#FDF6F0] border border-[#F5D0B5] font-bold'
                   : 'text-[#495057] hover:text-[#181A1B] hover:bg-[#F1F3F5]'
               }`}
             >
               {t('allOrders')}
             </Link>
-            <Link
-              to="/orders?department=Higher%20Education"
-              className="px-3.5 py-1.5 rounded-md text-[#495057] hover:text-[#181A1B] hover:bg-[#F1F3F5] transition"
-            >
-              {t('departments')}
-            </Link>
+
+            {/* Departments Dropdown */}
+            <div className="relative" ref={deptRef}>
+              <button
+                type="button"
+                onClick={() => setIsDeptOpen(!isDeptOpen)}
+                className={`inline-flex items-center space-x-1 px-3.5 py-1.5 rounded-md transition cursor-pointer ${
+                  isDeptOpen || location.search.includes('department=')
+                    ? 'text-[#B84A00] bg-[#FDF6F0] border border-[#F5D0B5] font-bold'
+                    : 'text-[#495057] hover:text-[#181A1B] hover:bg-[#F1F3F5]'
+                }`}
+              >
+                <Building className="w-3.5 h-3.5 text-[#B84A00]" />
+                <span>{t('departments')}</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isDeptOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isDeptOpen && (
+                <div className="absolute left-0 mt-2 w-72 bg-white rounded-md shadow-dropdown border border-[#DFE3E8] py-2 z-50 animate-in fade-in duration-150">
+                  <div className="px-3.5 py-1.5 text-[10px] font-bold text-[#6C757D] uppercase tracking-wider border-b border-[#DFE3E8] mb-1 flex items-center justify-between">
+                    <span>Administrative Portfolios</span>
+                    <span className="font-mono text-[9px] text-[#B84A00]">8 DEPARTMENTS</span>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto divide-y divide-[#F1F3F5]">
+                    {popularDepartments.map((dept) => (
+                      <button
+                        key={dept}
+                        type="button"
+                        onClick={() => {
+                          setIsDeptOpen(false);
+                          navigate(`/orders?department=${encodeURIComponent(dept)}`);
+                        }}
+                        className="w-full text-left px-3.5 py-2 text-xs text-[#181A1B] hover:bg-[#FDF6F0] hover:text-[#B84A00] transition flex items-center justify-between group cursor-pointer"
+                      >
+                        <span className="truncate font-medium">{dept}</span>
+                        <ExternalLink className="w-3 h-3 text-[#CFD6DE] group-hover:text-[#B84A00] shrink-0 ml-1.5" />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="border-t border-[#DFE3E8] mt-1 pt-1.5 px-3.5 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsDeptOpen(false);
+                        navigate('/#departments');
+                      }}
+                      className="text-[11px] text-[#B84A00] hover:underline font-semibold block py-1 cursor-pointer"
+                    >
+                      Browse on Home →
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsDeptOpen(false);
+                        navigate('/orders');
+                      }}
+                      className="text-[11px] text-[#6C757D] hover:underline font-medium block py-1 cursor-pointer"
+                    >
+                      All Orders
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Right Action Items: Real-Time Alerts & Admin */}
@@ -312,11 +387,30 @@ const Navbar = () => {
               to="/orders"
               onClick={() => setIsMobileMenuOpen(false)}
               className={`block px-3 py-2 rounded-md text-xs font-semibold ${
-                isActive('/orders') ? 'bg-[#FDF6F0] text-[#B84A00]' : 'text-[#495057]'
+                isActive('/orders') && !location.search.includes('department=') ? 'bg-[#FDF6F0] text-[#B84A00]' : 'text-[#495057]'
               }`}
             >
               {t('allOrders')}
             </Link>
+
+            <div className="pt-2 pb-1 px-3 text-[10px] font-bold text-[#6C757D] uppercase tracking-wider">
+              {t('departments')}
+            </div>
+            <div className="grid grid-cols-1 gap-1 px-2">
+              {popularDepartments.map((dept) => (
+                <button
+                  key={dept}
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate(`/orders?department=${encodeURIComponent(dept)}`);
+                  }}
+                  className="text-left px-2.5 py-1.5 rounded-md text-xs text-[#181A1B] hover:bg-[#FDF6F0] hover:text-[#B84A00] font-medium truncate"
+                >
+                  {dept}
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>

@@ -38,6 +38,22 @@ const OrdersListPage = () => {
   const [categoriesList, setCategoriesList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Sync state when URL search parameters change (e.g., clicking navbar or external links)
+  useEffect(() => {
+    const deptParam = searchParams.get('department') || 'all';
+    const catParam = searchParams.get('category') || 'all';
+    const searchParam = searchParams.get('search') || '';
+    const startParam = searchParams.get('startDate') || '';
+    const endParam = searchParams.get('endDate') || '';
+
+    setDepartment(deptParam);
+    setCategory(catParam);
+    setSearch(searchParam);
+    setStartDate(startParam);
+    setEndDate(endParam);
+    setPage(1);
+  }, [searchParams]);
+
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
@@ -164,8 +180,16 @@ const OrdersListPage = () => {
               <select
                 value={department}
                 onChange={(e) => {
-                  setDepartment(e.target.value);
+                  const val = e.target.value;
+                  setDepartment(val);
                   setPage(1);
+                  const p = new URLSearchParams(searchParams);
+                  if (val && val !== 'all') {
+                    p.set('department', val);
+                  } else {
+                    p.delete('department');
+                  }
+                  setSearchParams(p);
                 }}
                 className="w-full p-2 text-xs rounded-md border border-[#DFE3E8] bg-white text-[#181A1B] focus:outline-none focus:ring-1 focus:ring-[#B84A00]"
               >
@@ -186,8 +210,16 @@ const OrdersListPage = () => {
               <select
                 value={category}
                 onChange={(e) => {
-                  setCategory(e.target.value);
+                  const val = e.target.value;
+                  setCategory(val);
                   setPage(1);
+                  const p = new URLSearchParams(searchParams);
+                  if (val && val !== 'all') {
+                    p.set('category', val);
+                  } else {
+                    p.delete('category');
+                  }
+                  setSearchParams(p);
                 }}
                 className="w-full p-2 text-xs rounded-md border border-[#DFE3E8] bg-white text-[#181A1B] focus:outline-none focus:ring-1 focus:ring-[#B84A00]"
               >

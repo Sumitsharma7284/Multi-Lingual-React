@@ -202,7 +202,7 @@ const HomePage = () => {
       </section>
 
       {/* 3. Explore by Government Department */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8">
+      <section id="departments" className="max-w-7xl mx-auto px-4 sm:px-8 scroll-mt-24">
         <div className="mb-5 pb-3 border-b border-[#DFE3E8]">
           <div className="flex items-center space-x-2">
             <span className="w-2.5 h-2.5 bg-[#181A1B] rounded-sm"></span>
